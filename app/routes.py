@@ -8,14 +8,20 @@ from app.models import User
 from flask_login import current_user, login_user, logout_user
 from flask_login import login_required
 from werkzeug.urls import url_parse
+from datetime import datetime
 
+
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
 
 
 @app.route('/')
 @app.route('/index')
 @login_required
 def index():
-    user = {'username': "Uzul"}
     posts = [
         {
             'author': {'username': 'user1'},
