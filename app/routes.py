@@ -6,11 +6,13 @@ from .forms import LoginForm
 from .forms import RegistrationForm
 from .forms import EditProfileForm
 from .forms import PostForm
+from .forms import ResetPasswordRequestForm
 from app.models import User, Post
 from flask_login import current_user, login_user, logout_user
 from flask_login import login_required
 from werkzeug.urls import url_parse
 from datetime import datetime
+from app.email import send_password_reset_email
 
 
 @app.before_request
@@ -152,3 +154,20 @@ def unfollow(username):
     db.session.commit()
     flash('You are not following {}'.format(username))
     return redirect(url_for('user', username=username))
+
+
+@app.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = ResetPasswordRequestForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user:
+            send_password_reset_email(user)
+        flash('Check you email for the instruction to reset your password')
+        return redirect(url_for('login'))
+    return render_template('reset_password_request.html',
+                           form=form, title='Reset Password')
+
+
