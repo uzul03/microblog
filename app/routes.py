@@ -14,6 +14,7 @@ from flask_login import login_required
 from werkzeug.urls import url_parse
 from datetime import datetime
 from app.email import send_password_reset_email
+from guess_language import guess_language
 
 
 @app.before_request
@@ -29,7 +30,10 @@ def before_request():
 def index():
     form = PostForm()
     if form.validate_on_submit():
-        post = Post(body=form.post.data, author=current_user)
+        language = guess_language(form.post.data)
+        if language == 'UNKNOWN' or len(language) > 5:
+            language = ''
+        post = Post(body=form.post.data, author=current_user, language=language)
         db.session.add(post)
         db.session.commit()
         flash('Your post is now live!')

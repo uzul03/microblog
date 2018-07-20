@@ -11,7 +11,7 @@
             </a>
             sayd {{ moment(post.timestamp).fromNow() }}:
             <br>
-            {{ post.body }}
+            <span id="post{{ post.id }}">{{ post.body }}</span>
         </td>
     </tr>
 </table>
