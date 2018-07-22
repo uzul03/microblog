@@ -1,7 +1,7 @@
 from flask_mail import Message
 from app import mail
 from flask import render_template
-from app import app
+from app import current_app
 from threading import Thread
 
 
@@ -10,7 +10,7 @@ def send_email(subject, sender, recipients, text_body, html_body):
     msg.body = text_body
     msg.html = html_body
     #mail.send(msg)
-    Thread(target=send_async_email, args=(app, msg)).start()
+    Thread(target=send_async_email, args=(current_app, msg)).start()
 
 
 def send_async_email(app, msg):
@@ -18,12 +18,12 @@ def send_async_email(app, msg):
         mail.send(msg)
 
 
-def send_password_reset_email(user):
-    token = user.get_reset_password_token()
-    send_email(subject='Reset Your Password',
-               sender=app.config['ADMINS'][0],
-               recipients=[user.email],
-               text_body=render_template('email/reset_password.txt',
-                                         token=token, user=user),
-               html_body=render_template('email/reset_password.html',
-                                         token=token, user=user))
+# def send_password_reset_email(user):
+#     token = user.get_reset_password_token()
+#     send_email(subject='Reset Your Password',
+#                sender=app.config['ADMINS'][0],
+#                recipients=[user.email],
+#                text_body=render_template('email/reset_password.txt',
+#                                          token=token, user=user),
+#                html_body=render_template('email/reset_password.html',
+#                                          token=token, user=user))
